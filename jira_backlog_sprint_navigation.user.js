@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  Navigate, move, and toggle Jira sprints using keyboard shortcuts
-// @author       Adam Karmiński (karminski.dev)
+// @author       You
 // @match        *://*.atlassian.net/*
 // @grant        none
 // ==/UserScript==
@@ -86,6 +86,7 @@
     const triggerMenuClick = (sprint) => {
         const menuButton = sprint?.querySelector('[data-testid^="software-backlog.card-list.sprints-menu"]');
         if (menuButton) {
+            menuButton.setAttribute('data-tm-script', 'true');
             menuButton.focus();
             menuButton.click();
         }
@@ -95,6 +96,7 @@
         setTimeout(() => {
             const option = document.querySelector(`[data-testid="${testid}"]`);
             if (option) {
+                option.setAttribute('data-tm-script', 'true');
                 option.click();
                 setTimeout(() => {
                     updateSprints();
@@ -157,8 +159,21 @@
         }
     };
 
+    const handleClick = (e) => {
+        if (e.target?.getAttribute('data-tm-script') === 'true') {
+            e.target.removeAttribute('data-tm-script');
+            return;
+        }
+
+        const focusedSprint = getFocusedSprint();
+        if (!focusedSprint) return;
+        if (!focusedSprint.contains(e.target)) {
+            clearHighlight();
+        }
+    };
+
     window.addEventListener('keydown', handleKeydown);
+    window.addEventListener('click', handleClick);
     addFocusStyle();
     updateSprints();
-    focusSprint(0);
 })();
