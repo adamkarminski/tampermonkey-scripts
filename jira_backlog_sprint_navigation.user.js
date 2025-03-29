@@ -145,7 +145,7 @@
         updateSprints();
         if (sprints.length === 0) return;
 
-        if (e.key === 'z' && !e.shiftKey) {
+        if (e.key === 'ArrowUp' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
             updateSprints();
             if (!getFocusedSprint()) {
                 focusSprint(sprints.length - 1);
@@ -153,7 +153,7 @@
                 focusSprint(focusedIndex - 1);
             }
             return;
-        } else if (e.key === 'x' && !e.shiftKey) {
+        } else if (e.key === 'ArrowDown' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
             updateSprints();
             if (!getFocusedSprint()) {
                 focusSprint(0);
@@ -173,16 +173,16 @@
 
         currentSprintId = getSprintId(sprint);
 
-        if (e.key === 'ArrowUp' && !e.shiftKey) {
+        if ((e.key === 'ArrowUp') && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
             triggerMenuClick(sprint);
             clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-up');
-        } else if (e.key === 'ArrowDown' && !e.shiftKey) {
+        } else if ((e.key === 'ArrowDown') && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
             triggerMenuClick(sprint);
             clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-down');
-        } else if (e.key === 'ArrowUp' && e.shiftKey) {
+        } else if ((e.key === 'ArrowUp') && (e.metaKey || e.ctrlKey) && e.shiftKey) {
             triggerMenuClick(sprint);
             clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-to-top');
-        } else if (e.key === 'ArrowDown' && e.shiftKey) {
+        } else if ((e.key === 'ArrowDown') && (e.metaKey || e.ctrlKey) && e.shiftKey) {
             triggerMenuClick(sprint);
             clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-to-bottom');
         } else if (e.key === 'E' && e.shiftKey) {
@@ -191,7 +191,7 @@
         } else if ((e.key === 'Backspace' || e.key === 'Delete') && e.shiftKey) {
             triggerMenuClick(sprint);
             clickMenuOption('software-backlog.card-list.sprints-menu.sprint-delete');
-        } else if (e.key === 'a' && !e.shiftKey) {
+        } else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
             toggleSprint(sprint);
         }
     };
@@ -213,5 +213,5 @@
     window.addEventListener('click', handleClick);
     addFocusStyle();
     updateSprints();
-
+    
 })();
