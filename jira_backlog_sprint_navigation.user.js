@@ -213,5 +213,5 @@
     window.addEventListener('click', handleClick);
     addFocusStyle();
     updateSprints();
-    
+
 })();
