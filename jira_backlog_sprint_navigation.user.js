@@ -115,6 +115,30 @@
     };
 
     const handleKeydown = (e) => {
+        const active = document.activeElement;
+        if (
+            active && (
+                active.tagName === 'INPUT' ||
+                active.tagName === 'TEXTAREA' ||
+                active.isContentEditable ||
+                active.closest('[role="textbox"], [contenteditable="true"]')
+            )
+        ) return;
+        if (e.key === 'C' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            if (!isBacklogPage()) return;
+            const createButton = document.querySelector('[data-testid="software-backlog.card-list.create-sprint-button"]');
+            if (createButton) {
+                createButton.setAttribute('data-tm-script', 'true');
+                createButton.click();
+                setTimeout(() => {
+                    updateSprints();
+                    if (sprints.length >= 2) {
+                        focusSprint(sprints.length - 2); // penultimate
+                    }
+                }, 500);
+            }
+            return;
+        }
         if (!isBacklogPage()) return;
         if (blurInProgress) return;
 
@@ -189,4 +213,5 @@
     window.addEventListener('click', handleClick);
     addFocusStyle();
     updateSprints();
+
 })();
