@@ -108,7 +108,10 @@
 
     const toggleSprint = (sprint) => {
         const chevron = sprint?.querySelector('[aria-label="expand"], [aria-label="collapse"]');
-        if (chevron) chevron.click();
+        if (chevron) {
+            chevron.setAttribute('data-tm-script', 'true');
+            chevron.click();
+        }
     };
 
     const handleKeydown = (e) => {
@@ -119,10 +122,20 @@
         if (sprints.length === 0) return;
 
         if (e.key === 'z' && !e.shiftKey) {
-            focusSprint(focusedIndex - 1);
+            updateSprints();
+            if (!getFocusedSprint()) {
+                focusSprint(sprints.length - 1);
+            } else {
+                focusSprint(focusedIndex - 1);
+            }
             return;
         } else if (e.key === 'x' && !e.shiftKey) {
-            focusSprint(focusedIndex + 1);
+            updateSprints();
+            if (!getFocusedSprint()) {
+                focusSprint(0);
+            } else {
+                focusSprint(focusedIndex + 1);
+            }
             return;
         }
 
