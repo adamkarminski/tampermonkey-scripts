@@ -11,6 +11,18 @@
 (function () {
     'use strict';
 
+    // Selectors
+    const SPRINT_CONTAINER_SELECTOR = '[data-testid^="software-backlog.card-list.container"]';
+    const SPRINT_MENU_BUTTON_SELECTOR = '[data-testid^="software-backlog.card-list.sprints-menu"]';
+    const SPRINT_MOVE_UP_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-move-up';
+    const SPRINT_MOVE_DOWN_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-move-down';
+    const SPRINT_MOVE_TO_TOP_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-move-to-top';
+    const SPRINT_MOVE_TO_BOTTOM_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-move-to-bottom';
+    const SPRINT_EDIT_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-edit';
+    const SPRINT_DELETE_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-delete';
+    const CREATE_SPRINT_BUTTON_SELECTOR = '[data-testid="software-backlog.card-list.create-sprint-button"]';
+    const EXPAND_COLLAPSE_SELECTOR = '[aria-label="expand"], [aria-label="collapse"]';
+
     let sprints = [];
     let focusedIndex = 0;
     const focusClass = 'tm-focused-sprint';
@@ -18,8 +30,7 @@
     let blurInProgress = false;
 
     const isBacklogPage = () => {
-        const h1 = document.querySelector('h1');
-        return h1 && h1.textContent.toLowerCase().includes('backlog');
+        return document.querySelector('[data-testid="software-backlog.backlog"]') !== null;
     };
 
     const addFocusStyle = () => {
@@ -34,7 +45,7 @@
     };
 
     const updateSprints = () => {
-        sprints = Array.from(document.querySelectorAll('[data-testid^="software-backlog.card-list.container"]'));
+        sprints = Array.from(document.querySelectorAll(SPRINT_CONTAINER_SELECTOR));
     };
 
     const getFocusedSprint = () => {
@@ -57,7 +68,7 @@
 
     const clearHighlight = () => {
         sprints.forEach(el => el.classList.remove(focusClass));
-        focusedIndex = 0;
+        // Do not reset focusedIndex anymore
         currentSprintId = null;
         clearNativeFocus();
     };
@@ -84,7 +95,7 @@
     };
 
     const triggerMenuClick = (sprint) => {
-        const menuButton = sprint?.querySelector('[data-testid^="software-backlog.card-list.sprints-menu"]');
+        const menuButton = sprint?.querySelector(SPRINT_MENU_BUTTON_SELECTOR);
         if (menuButton) {
             menuButton.setAttribute('data-tm-script', 'true');
             menuButton.focus();
@@ -107,7 +118,7 @@
     };
 
     const toggleSprint = (sprint) => {
-        const chevron = sprint?.querySelector('[aria-label="expand"], [aria-label="collapse"]');
+        const chevron = sprint?.querySelector(EXPAND_COLLAPSE_SELECTOR);
         if (chevron) {
             chevron.setAttribute('data-tm-script', 'true');
             chevron.click();
@@ -124,9 +135,10 @@
                 active.closest('[role="textbox"], [contenteditable="true"]')
             )
         ) return;
+
         if (e.key === 'C' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
             if (!isBacklogPage()) return;
-            const createButton = document.querySelector('[data-testid="software-backlog.card-list.create-sprint-button"]');
+            const createButton = document.querySelector(CREATE_SPRINT_BUTTON_SELECTOR);
             if (createButton) {
                 createButton.setAttribute('data-tm-script', 'true');
                 createButton.click();
@@ -139,6 +151,7 @@
             }
             return;
         }
+
         if (!isBacklogPage()) return;
         if (blurInProgress) return;
 
@@ -175,22 +188,22 @@
 
         if ((e.key === 'ArrowUp') && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
             triggerMenuClick(sprint);
-            clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-up');
+            clickMenuOption(SPRINT_MOVE_UP_SELECTOR);
         } else if ((e.key === 'ArrowDown') && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
             triggerMenuClick(sprint);
-            clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-down');
+            clickMenuOption(SPRINT_MOVE_DOWN_SELECTOR);
         } else if ((e.key === 'ArrowUp') && (e.metaKey || e.ctrlKey) && e.shiftKey) {
             triggerMenuClick(sprint);
-            clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-to-top');
+            clickMenuOption(SPRINT_MOVE_TO_TOP_SELECTOR);
         } else if ((e.key === 'ArrowDown') && (e.metaKey || e.ctrlKey) && e.shiftKey) {
             triggerMenuClick(sprint);
-            clickMenuOption('software-backlog.card-list.sprints-menu.sprint-move-to-bottom');
+            clickMenuOption(SPRINT_MOVE_TO_BOTTOM_SELECTOR);
         } else if (e.key === 'E' && e.shiftKey) {
             triggerMenuClick(sprint);
-            clickMenuOption('software-backlog.card-list.sprints-menu.sprint-edit');
+            clickMenuOption(SPRINT_EDIT_SELECTOR);
         } else if ((e.key === 'Backspace' || e.key === 'Delete') && e.shiftKey) {
             triggerMenuClick(sprint);
-            clickMenuOption('software-backlog.card-list.sprints-menu.sprint-delete');
+            clickMenuOption(SPRINT_DELETE_SELECTOR);
         } else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
             toggleSprint(sprint);
         }
@@ -203,9 +216,26 @@
         }
 
         const focusedSprint = getFocusedSprint();
-        if (!focusedSprint) return;
+        if (!focusedSprint) {
+            if (e.shiftKey) {
+                const sprintClicked = e.target.closest(SPRINT_CONTAINER_SELECTOR);
+                if (sprintClicked) {
+                    updateSprints();
+                    focusSprint(sprints.indexOf(sprintClicked));
+                }
+            }
+            return;
+        }
         if (!focusedSprint.contains(e.target)) {
-            clearHighlight();
+            if (e.shiftKey) {
+                const sprintClicked = e.target.closest(SPRINT_CONTAINER_SELECTOR);
+                if (sprintClicked) {
+                    updateSprints();
+                    focusSprint(sprints.indexOf(sprintClicked));
+                }
+            } else {
+                clearHighlight();
+            }
         }
     };
 
@@ -213,5 +243,4 @@
     window.addEventListener('click', handleClick);
     addFocusStyle();
     updateSprints();
-
 })();
