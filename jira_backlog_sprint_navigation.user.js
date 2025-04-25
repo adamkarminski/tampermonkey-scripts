@@ -135,7 +135,7 @@
             )
         ) return;
 
-        if (e.key === 'C' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        if (e.key === 'C' && e.shiftKey && e.ctrlKey && e.altKey && e.metaKey) {
             if (!isBacklogPage()) return;
             const createButton = document.querySelector(CREATE_SPRINT_BUTTON_SELECTOR);
             if (createButton) {
