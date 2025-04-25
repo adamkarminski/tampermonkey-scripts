@@ -21,7 +21,7 @@
     const SPRINT_EDIT_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-edit';
     const SPRINT_DELETE_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-delete';
     const CREATE_SPRINT_BUTTON_SELECTOR = '[data-testid="software-backlog.card-list.create-sprint-button"]';
-    const EXPAND_COLLAPSE_SELECTOR = '[aria-label="expand"], [aria-label="collapse"]';
+    const EXPAND_COLLAPSE_SELECTOR = '[role="button"][aria-expanded]';
 
     let sprints = [];
     let focusedIndex = 0;
