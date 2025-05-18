@@ -20,7 +20,7 @@
     const SPRINT_MOVE_TO_BOTTOM_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-move-to-bottom';
     const SPRINT_EDIT_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-edit';
     const SPRINT_DELETE_SELECTOR = 'software-backlog.card-list.sprints-menu.sprint-delete';
-    const CREATE_SPRINT_BUTTON_SELECTOR = '[data-testid="software-backlog.card-list.create-sprint-button"]';
+    const CREATE_SPRINT_BUTTON_SELECTOR = '[data-testid="software-backlog.card-list.card-list-header.create-sprint-button"]';
     const EXPAND_COLLAPSE_SELECTOR = '[data-testid="software-backlog.card-list.left-side"]';
 
     let sprints = [];
@@ -68,6 +68,7 @@
 
     const clearHighlight = () => {
         sprints.forEach(el => el.classList.remove(focusClass));
+        // Do not reset focusedIndex anymore
         currentSprintId = null;
         clearNativeFocus();
     };
@@ -135,7 +136,7 @@
             )
         ) return;
 
-        if (e.key === 'C' && e.shiftKey && e.ctrlKey && e.altKey && e.metaKey) {
+        if ((e.ctrlKey || e.metaKey) && e.altKey && (e.key === 'n' || e.key === 'N')) {
             if (!isBacklogPage()) return;
             const createButton = document.querySelector(CREATE_SPRINT_BUTTON_SELECTOR);
             if (createButton) {
@@ -209,6 +210,22 @@
     };
 
     const handleClick = (e) => {
+        // Option+Click on summary to trigger edit
+        if (e.altKey) {
+            const summary = e.target.closest('[data-testid="issue-field-summary.ui.multiline-inline-summary.ui.read.link-item"]');
+            if (summary) {
+                e.preventDefault();
+                e.stopPropagation();
+                const editWrapper = summary.closest('[data-testid^="software-backlog.card-list.card.content-container"]')
+                    ?.querySelector('[data-testid="issue-field-summary-inline-edit-link.ui.read.edit-icon"]');
+                const editButton = editWrapper?.querySelector('button');
+                if (editButton) {
+                    editButton.click();
+                    return;
+                }
+            }
+        }
+
         if (e.target?.getAttribute('data-tm-script') === 'true') {
             e.target.removeAttribute('data-tm-script');
             return;
@@ -239,7 +256,8 @@
     };
 
     window.addEventListener('keydown', handleKeydown);
-    window.addEventListener('click', handleClick);
+    window.addEventListener('click', handleClick, true);
+
     addFocusStyle();
     updateSprints();
 })();
